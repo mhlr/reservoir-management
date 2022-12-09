@@ -88,18 +88,9 @@ Vmin Vmax Vinit
 
 # + tags=[]
 import itertools as it
-import functools as ft
-import collections as coll
-import random, json, string, sys, pickle, shutil, string
 
 import numpy as np
 import pandas as pd
-import networkx as nx
-from cytoolz import curried as tl
-import janitor
-
-from icecream import ic
-from prettyprinter import pprint as pp, install_extras
 
 import dimod
 from dwave import system as dw
