@@ -191,54 +191,6 @@ Subject To
  at_least_one_pump_in_reserve_at_time24: + 1 pump1_time24 + 1 pump2_time24 
  + 1 pump3_time24 + 1 pump4_time24 + 1 pump5_time24 + 1 pump6_time24 
  + 1 pump7_time24  <= 6.0
- sufficient_reserve_at_time1: + 1 volume_time1  >= 523.5
- sufficient_reserve_at_time2: + 1 volume_time2  >= 523.5
- sufficient_reserve_at_time3: + 1 volume_time3  >= 523.5
- sufficient_reserve_at_time4: + 1 volume_time4  >= 523.5
- sufficient_reserve_at_time5: + 1 volume_time5  >= 523.5
- sufficient_reserve_at_time6: + 1 volume_time6  >= 523.5
- sufficient_reserve_at_time7: + 1 volume_time7  >= 523.5
- sufficient_reserve_at_time8: + 1 volume_time8  >= 523.5
- sufficient_reserve_at_time9: + 1 volume_time9  >= 523.5
- sufficient_reserve_at_time10: + 1 volume_time10  >= 523.5
- sufficient_reserve_at_time11: + 1 volume_time11  >= 523.5
- sufficient_reserve_at_time12: + 1 volume_time12  >= 523.5
- sufficient_reserve_at_time13: + 1 volume_time13  >= 523.5
- sufficient_reserve_at_time14: + 1 volume_time14  >= 523.5
- sufficient_reserve_at_time15: + 1 volume_time15  >= 523.5
- sufficient_reserve_at_time16: + 1 volume_time16  >= 523.5
- sufficient_reserve_at_time17: + 1 volume_time17  >= 523.5
- sufficient_reserve_at_time18: + 1 volume_time18  >= 523.5
- sufficient_reserve_at_time19: + 1 volume_time19  >= 523.5
- sufficient_reserve_at_time20: + 1 volume_time20  >= 523.5
- sufficient_reserve_at_time21: + 1 volume_time21  >= 523.5
- sufficient_reserve_at_time22: + 1 volume_time22  >= 523.5
- sufficient_reserve_at_time23: + 1 volume_time23  >= 523.5
- sufficient_reserve_at_time24: + 1 volume_time24  >= 523.5
- within_capacity_at_time1: + 1 volume_time1  <= 1500.0
- within_capacity_at_time2: + 1 volume_time2  <= 1500.0
- within_capacity_at_time3: + 1 volume_time3  <= 1500.0
- within_capacity_at_time4: + 1 volume_time4  <= 1500.0
- within_capacity_at_time5: + 1 volume_time5  <= 1500.0
- within_capacity_at_time6: + 1 volume_time6  <= 1500.0
- within_capacity_at_time7: + 1 volume_time7  <= 1500.0
- within_capacity_at_time8: + 1 volume_time8  <= 1500.0
- within_capacity_at_time9: + 1 volume_time9  <= 1500.0
- within_capacity_at_time10: + 1 volume_time10  <= 1500.0
- within_capacity_at_time11: + 1 volume_time11  <= 1500.0
- within_capacity_at_time12: + 1 volume_time12  <= 1500.0
- within_capacity_at_time13: + 1 volume_time13  <= 1500.0
- within_capacity_at_time14: + 1 volume_time14  <= 1500.0
- within_capacity_at_time15: + 1 volume_time15  <= 1500.0
- within_capacity_at_time16: + 1 volume_time16  <= 1500.0
- within_capacity_at_time17: + 1 volume_time17  <= 1500.0
- within_capacity_at_time18: + 1 volume_time18  <= 1500.0
- within_capacity_at_time19: + 1 volume_time19  <= 1500.0
- within_capacity_at_time20: + 1 volume_time20  <= 1500.0
- within_capacity_at_time21: + 1 volume_time21  <= 1500.0
- within_capacity_at_time22: + 1 volume_time22  <= 1500.0
- within_capacity_at_time23: + 1 volume_time23  <= 1500.0
- within_capacity_at_time24: + 1 volume_time24  <= 1500.0
  volume_at_time1: + 75 pump1_time1 + 133 pump2_time1 + 157 pump3_time1 
  + 176 pump4_time1 + 59 pump5_time1 + 69 pump6_time1 + 120 pump7_time1 
  - 1 volume_time1  = -505.38
@@ -311,6 +263,54 @@ Subject To
  volume_at_time24: + 1 volume_time23 + 75 pump1_time24 + 133 pump2_time24 
  + 157 pump3_time24 + 176 pump4_time24 + 59 pump5_time24 + 69 pump6_time24 
  + 120 pump7_time24 - 1 volume_time24  = 70.43
+ within_capacity_at_time1: + 1 volume_time1  <= 1500.0
+ within_capacity_at_time2: + 1 volume_time2  <= 1500.0
+ within_capacity_at_time3: + 1 volume_time3  <= 1500.0
+ within_capacity_at_time4: + 1 volume_time4  <= 1500.0
+ within_capacity_at_time5: + 1 volume_time5  <= 1500.0
+ within_capacity_at_time6: + 1 volume_time6  <= 1500.0
+ within_capacity_at_time7: + 1 volume_time7  <= 1500.0
+ within_capacity_at_time8: + 1 volume_time8  <= 1500.0
+ within_capacity_at_time9: + 1 volume_time9  <= 1500.0
+ within_capacity_at_time10: + 1 volume_time10  <= 1500.0
+ within_capacity_at_time11: + 1 volume_time11  <= 1500.0
+ within_capacity_at_time12: + 1 volume_time12  <= 1500.0
+ within_capacity_at_time13: + 1 volume_time13  <= 1500.0
+ within_capacity_at_time14: + 1 volume_time14  <= 1500.0
+ within_capacity_at_time15: + 1 volume_time15  <= 1500.0
+ within_capacity_at_time16: + 1 volume_time16  <= 1500.0
+ within_capacity_at_time17: + 1 volume_time17  <= 1500.0
+ within_capacity_at_time18: + 1 volume_time18  <= 1500.0
+ within_capacity_at_time19: + 1 volume_time19  <= 1500.0
+ within_capacity_at_time20: + 1 volume_time20  <= 1500.0
+ within_capacity_at_time21: + 1 volume_time21  <= 1500.0
+ within_capacity_at_time22: + 1 volume_time22  <= 1500.0
+ within_capacity_at_time23: + 1 volume_time23  <= 1500.0
+ within_capacity_at_time24: + 1 volume_time24  <= 1500.0
+ sufficient_reserve_at_time1: + 1 volume_time1  >= 523.5
+ sufficient_reserve_at_time2: + 1 volume_time2  >= 523.5
+ sufficient_reserve_at_time3: + 1 volume_time3  >= 523.5
+ sufficient_reserve_at_time4: + 1 volume_time4  >= 523.5
+ sufficient_reserve_at_time5: + 1 volume_time5  >= 523.5
+ sufficient_reserve_at_time6: + 1 volume_time6  >= 523.5
+ sufficient_reserve_at_time7: + 1 volume_time7  >= 523.5
+ sufficient_reserve_at_time8: + 1 volume_time8  >= 523.5
+ sufficient_reserve_at_time9: + 1 volume_time9  >= 523.5
+ sufficient_reserve_at_time10: + 1 volume_time10  >= 523.5
+ sufficient_reserve_at_time11: + 1 volume_time11  >= 523.5
+ sufficient_reserve_at_time12: + 1 volume_time12  >= 523.5
+ sufficient_reserve_at_time13: + 1 volume_time13  >= 523.5
+ sufficient_reserve_at_time14: + 1 volume_time14  >= 523.5
+ sufficient_reserve_at_time15: + 1 volume_time15  >= 523.5
+ sufficient_reserve_at_time16: + 1 volume_time16  >= 523.5
+ sufficient_reserve_at_time17: + 1 volume_time17  >= 523.5
+ sufficient_reserve_at_time18: + 1 volume_time18  >= 523.5
+ sufficient_reserve_at_time19: + 1 volume_time19  >= 523.5
+ sufficient_reserve_at_time20: + 1 volume_time20  >= 523.5
+ sufficient_reserve_at_time21: + 1 volume_time21  >= 523.5
+ sufficient_reserve_at_time22: + 1 volume_time22  >= 523.5
+ sufficient_reserve_at_time23: + 1 volume_time23  >= 523.5
+ sufficient_reserve_at_time24: + 1 volume_time24  >= 523.5
 
 Bounds
  0.0 <= volume_time1 <= 1e+30

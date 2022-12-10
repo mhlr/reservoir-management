@@ -22,11 +22,11 @@
 #
 # > The water supply system under consideration is that of a water supply operator based in a town with a population of about 25,000 inhabitants, located in Eastern Poland. **The main parts of the system are wells, pumps, a reservoir tank, and the distribution pipeline network.**
 #
-# > Supplied water is groundwater pumped from 7 wells. The capacities and values of the electric power of the pumps are presented in Table 1. **Water is pumped from the wells to a single reservoir tank with the capacity of Vmax = 1500 m3 (the maximal volume of stored water)**.
+# > Supplied water is groundwater pumped from 7 wells. The capacities and values of the electric power of the pumps are presented in Table 1. **Water is pumped from the wells to a single reservoir tank with the capacity of Vmax** = 1500 m3 (the maximal volume of stored water).
 #
-# > **The demand for water varies over time**. The outflow of water from the reservoir tank via the distribution network to customers is a continuous process. For practical reasons, **predictions of demand are made for 24 one-hour timeslots**.
+# > **The demand for water varies over time**. **The outflow of water from the reservoir tank via the distribution network to customers is a continuous process.** For practical reasons, **predictions of demand are made for 24 one-hour timeslots**.
 #
-# > Controlling the pumps must obey the following requirements. **The pumps can operate with their nominal capacities only**, and the amount of water pumped by any pump depends on the time of operation only. **Each pump must operate for at least one hour per day.** Additionally, **at least one well and the pump integrated with it must be kept as a reserve at any moment of the day**. **The water inside the tank should be replaced at least once per day**. During standard operational conditions, **the volume of water in the reservoir tank cannot be less than Vmin = 523.5 m3**. It is the firefighting reserve, which is kept in order to satisfy an extra demand when a fire is extinguished by using water supplied from hydrants.
+# > Controlling the pumps must obey the following requirements. **The pumps can operate with their nominal capacities only**, and the amount of water pumped by any pump depends on the time of operation only. **Each pump must operate for at least one hour per day.** Additionally, **at least one well and the pump integrated with it must be kept as a reserve at any moment of the day**. **The water inside the tank should be replaced at least once per day**. During standard operational conditions, **the volume of water in the reservoir tank cannot be less than Vmin** = 523.5 m3. It is the firefighting reserve, which is kept in order to satisfy an extra demand when a fire is extinguished by using water supplied from hydrants.
 #
 # > ... **the supplier of electric power does not use the same rate per MWh in its pricing** policy all day long. Instead, it uses three tariff levels ...
 
@@ -219,12 +219,12 @@ for time in schedule.time:
 # #);
 # -
 
-# #### *The volume of water in the reservoir tank cannot be less than Vmin*
+# #### *The outflow of water from the reservoir tank via the distribution network to customers is a continuous process*
 
 for time in schedule.time:
     model.add_constraint(
-        reservoir_volume(time) >= reservoir.Vmin,
-        f"sufficient_reserve_at_time{time}"
+        reservoir_outflow(time) == water_demand(time),
+        f"volume_at_time{time}"
     )
 
 # #### *Water is pumped from the wells to a single reservoir tank with the capacity of Vmax*
@@ -235,12 +235,12 @@ for time in schedule.time:
         f"within_capacity_at_time{time}"
     )
 
-# #### *The outflow of water from the reservoir tank via the distribution network to customers is a continuous process*
+# #### *The volume of water in the reservoir tank cannot be less than Vmin*
 
 for time in schedule.time:
     model.add_constraint(
-        reservoir_outflow(time) == water_demand(time),
-        f"volume_at_time{time}"
+        reservoir_volume(time) >= reservoir.Vmin,
+        f"sufficient_reserve_at_time{time}"
     )
 
 # + [markdown] tags=[]
