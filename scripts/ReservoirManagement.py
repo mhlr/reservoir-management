@@ -382,4 +382,12 @@ print(lp_dump)
 with open("reservoir.lp", "w") as f:
     print(lp_dump, file=f)
 
+# + [markdown] slideshow={"slide_type": "slide"}
+# # Formulation from paper
+# -
 
+# ![image.png](attachment:f7d47661-2f6d-4736-b946-dea72d7b64d3.png)
+#
+# - Note the that the highlighted 1 in cconstraint (3) should be a 0 since the $v_i$ represent volumes at the end of the hour.
+#
+# - The volume at the end of hour 1 would already be mdoified by the inflow and demand during the first hour.
