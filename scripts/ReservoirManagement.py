@@ -12,26 +12,36 @@
 #     name: python3
 # ---
 
+# + [markdown] slideshow={"slide_type": "slide"}
 # # Developing a D-Wave Leap application, from problem selection to model implementation
+# -
 
-# This notebook demonstrates an end to end process for users to develop D-Wave Leap application, from selecting a problem, through domain analysis to first model implementation.
-# The process is simulated using a paper from the literature as a proxy for the problem owner. This is done enable reproducibility while protecting privacy of users.
-# Only the problem motivation and description from the paper is used. The formulation & implementation are developed independently to illustrate a practical approach to the process.
-# Inline quotes from the paper should be read as a problem owner's responses to developer inquiries. Quotes are sometimes reused when they answer multiple questions.
+# - This notebook demonstrates an end to end process for users to develop D-Wave Leap application, from selecting a problem, through domain analysis to first model implementation.
+# - The process is simulated using a paper from the literature as a proxy for the problem owner.
+#     - This is done enable reproducibility while protecting privacy of users.
+# - Only the problem motivation and description from the paper is used.
+# - The formulation & implementation are developed independently to illustrate a practical approach to the process.
+# - Inline quotes from the paper should be read as a problem owner's responses to developer inquiries.
+#     - Quotes are sometimes reused when they answer multiple questions.
 
+# + [markdown] slideshow={"slide_type": "slide"}
 # ## Problem Selection
+# -
 
-# The paper [Kowalik P, Rzemieniak M. Binary Linear Programming as a Tool of Cost Optimization for a Water Supply Operator. Sustainability. 2021 13(6):3470.](https://doi.org/10.3390/su13063470) was selected. An annotated CC-licensed [copy](./sustainability-13-03470-v2.pdf) is provided It was chosen based on criteria discussed below. It builds on the prior [Kozłowski, E., Mazurkiewicz, D., Kowalska, B., Kowalski, D. (2018). Binary Linear Programming as a Decision-Making Aid for Water Intake Operators. In: Burduk, A., Mazurkiewicz, D. (eds) Intelligent Systems in Production Engineering and Maintenance – ISPEM 2017. ISPEM 2017. Advances in Intelligent Systems and Computing, vol 637. Springer, Cham.](https://doi.org/10.1007/978-3-319-64465-3_20)
+# - The paper [Kowalik P, Rzemieniak M. Binary Linear Programming as a Tool of Cost Optimization for a Water Supply Operator. Sustainability. 2021 13(6):3470.](https://doi.org/10.3390/su13063470) was selected.
+# - It was chosen based on criteria discussed below.
+# - An annotated CC-licensed [copy](./sustainability-13-03470-v2.pdf) is provided
+# - The paper builds on the prior [Kozłowski, E., Mazurkiewicz, D., Kowalska, B., Kowalski, D. (2018). Binary Linear Programming as a Decision-Making Aid for Water Intake Operators. In: Burduk, A., Mazurkiewicz, D. (eds) Intelligent Systems in Production Engineering and Maintenance – ISPEM 2017. ISPEM 2017. Advances in Intelligent Systems and Computing, vol 637. Springer, Cham.](https://doi.org/10.1007/978-3-319-64465-3_20)
 
-# + [markdown] tags=[]
+# + [markdown] tags=[] slideshow={"slide_type": "subslide"}
 # ### Is this a real problem?
 # -
 
 # > Supplying high-quality water at a competitive cost is a major challenge for water utilities worldwide, especially with ever-increasing water quality standards and energy prices [1,2]. Water supply systems are among the most important parts of infrastructure necessary to provide suitable quality of life for human beings.
-
+#
 # > The issues of water production optimization and energy savings are part of the topic of sustainable development. 
 
-# + [markdown] jp-MarkdownHeadingCollapsed=true tags=[]
+# + [markdown] jp-MarkdownHeadingCollapsed=true tags=[] slideshow={"slide_type": "subslide"}
 # ### What is the ROI of solving this problem?
 # -
 
@@ -40,6 +50,7 @@
 # Based on the provided data, the power cost of operating all the pumps constanly is 288.30555 2015-USD per day, which is a very loose upper bound.
 # There is no data to quantify other benefits of optimization, such as reduced risk of reservoir constraint violations and reduced labor costs, if the pump scheduling were manual.
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # ### Is there complete data for a self contained problem instance?
 # Complete data for pump capacities and power requirements as well as hourly water demand predictions and power costs are provided.
 #
@@ -49,29 +60,35 @@
 #
 # > The example numerical data of the demand values for 24 timeslots of just one specific day are presented in Table 3 (along with corresponding electric power prices).
 
-# ### What is the source of complexity?
+# + [markdown] slideshow={"slide_type": "subslide"}
+# ### What are the sources of complexity?
 # > Various prices of electric power make efficient controlling of the pumps much moredifficult because the requirements resulting from the demand levels as well as technical and safety conditions should be satisfied at the lowest cost.
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # ### Who is the problem owner?
 
 # + [markdown] tags=[]
 # > The water supply system under consideration is that of a water supply operator based in a town with a population of about 25,000 inhabitants, located in Eastern Poland.
-# -
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # ### What is the current solution to this problem?
 # > An example containing real-world input data was successfully solved using Microsoft Excel with a free OpenSolver add-in.
 #
 # This would be a red flag in a real commercial application, as there is little benefit in a quantum implementation of a problem that is solved to optimality with a free Excel plugin.
-# This does affect the pedagigical value of this  problem and it is treated as a green field problem for the purposes of this exercise.
+# This does affect the pedagogical value of this  problem and it is treated as a green field problem for the purposes of this exercise.
 
-# From [Kowalik P, Rzemieniak M. Binary Linear Programming as a Tool of Cost Optimization for a Water Supply Operator. Sustainability. 2021 13(6):3470.](https://doi.org/10.3390/su13063470)
-
+# + [markdown] slideshow={"slide_type": "slide"}
 # ## Problem Description
+# -
 
 # From [Kowalik P, Rzemieniak M. Binary Linear Programming as a Tool of Cost Optimization for a Water Supply Operator. Sustainability. 2021 13(6):3470.](https://doi.org/10.3390/su13063470)
 
 # > In order to optimize the operation of a water pumping station itself, it is necessary to create a pump schedule for some period of time (e.g., 24 h) that states when a given pump should be turned on and, if it is controllable, with what efficiency it should work (full capacity or below). Correct optimization requires defining many necessary constraints, including taking into account the predicted demand for water, which varies throughout the day, capacities of reservoir tanks and minimal volumes of water stored in them, costs of electrical power, etc.
 
+# + [markdown] slideshow={"slide_type": "subslide"}
+# ### Detailed specification
+
+# + [markdown] slideshow={"slide_type": "-"}
 # > **The objective of the article is the minimization of the cost of electric power used by the pumps supplying water.**
 #
 # > The water supply system under consideration is that of a water supply operator based in a town with a population of about 25,000 inhabitants, located in Eastern Poland. **The main parts of the system are wells, pumps, a reservoir tank, and the distribution pipeline network.**
@@ -90,12 +107,16 @@
 #
 # >  ... **in each timeslot, each pump can either be used or not**.
 
-# + [markdown] tags=[]
+# + [markdown] tags=[] slideshow={"slide_type": "slide"}
 # ## Problem instance data
 # -
 
 # From [Kowalik P, Rzemieniak M. Binary Linear Programming as a Tool of Cost Optimization for a Water Supply Operator. Sustainability. 2021 13(6):3470.](https://doi.org/10.3390/su13063470)
 
+# + [markdown] slideshow={"slide_type": "subslide"}
+# ### Pump data (Table 1)
+
+# + slideshow={"slide_type": "-"}
 # %%file pumps.csv
 id capacity power_consumption
 1 75 15
@@ -106,6 +127,10 @@ id capacity power_consumption
 6 69 33
 7 120 22
 
+# + [markdown] slideshow={"slide_type": "subslide"}
+# ### Power tariffs (Table 2)
+
+# + slideshow={"slide_type": "-"}
 # %%file tariff.csv
 start end price
 16 21 336.00
@@ -114,6 +139,10 @@ start end price
 13 16 169.00
 21 24 169.00
 
+# + [markdown] slideshow={"slide_type": "subslide"}
+# ### Horly water demand and power prices on 1 August 2015 (Table 3)
+
+# + slideshow={"slide_type": "-"}
 # %%file schedule.csv
 time water_demand power_price
 1 44.62 169
@@ -141,11 +170,15 @@ time water_demand power_price
 23 111.53 169
 24 70.43 169
 
+# + [markdown] slideshow={"slide_type": "subslide"}
+# ### Reservoir parameters
+
+# + slideshow={"slide_type": "-"}
 # %%file reservoir.csv
 Vmin Vmax Vinit
 523.5 1500 550
 
-# + [markdown] tags=[]
+# + [markdown] tags=[] slideshow={"slide_type": "subslide"}
 # ## Load data
 
 # + tags=[]
@@ -163,16 +196,19 @@ schedule = pd.read_csv("schedule.csv", sep=' ').set_index('time', drop=False)
 tariff = pd.read_csv("tariff.csv", sep=' ')
 reservoir = pd.read_csv("reservoir.csv", sep=' ').loc[0]
 
-schedule.power_price.sum()*pumps.power_consumption.sum()/1000 *.2652
-
-# + [markdown] tags=[]
+# + [markdown] tags=[] slideshow={"slide_type": "slide"}
 # ## Define domain language
+
+# + [markdown] slideshow={"slide_type": "subslide"}
+# ### Utilities
 # -
 
 Sum = dimod.quicksum
 
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # ### Inputs (Parameters)
+# -
 
 # #### *The capacities and values of the electric power of the pumps are presented ...*
 
@@ -198,7 +234,9 @@ def water_demand(time):
     return schedule.water_demand[time]
 
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # ### Outputs (Variables)
+# -
 
 # #### *In each timeslot, each pump can either be used or not*
 
@@ -216,7 +254,9 @@ def reservoir_volume(time):
     )
 
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # ### Derived terms
+# -
 
 # #### *Water is pumped from the wells to a single reservoir tank*
 
@@ -245,11 +285,18 @@ def power_used(time):
         )
 
 
+# + [markdown] slideshow={"slide_type": "slide"}
 # ## Construct model
+
+# + [markdown] slideshow={"slide_type": "subslide"}
+# ### Initialize model
+# -
 
 model = dimod.CQM()
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # ### Define objective
+# -
 
 # #### *The objective of the article is the minimization of the cost of electric power used by the pumps supplying water*
 
@@ -260,7 +307,7 @@ model.set_objective(
     )
 )
 
-# + [markdown] tags=[]
+# + [markdown] tags=[] slideshow={"slide_type": "subslide"}
 # ### Add constraints
 # -
 
@@ -310,7 +357,7 @@ for time in schedule.time:
         f"sufficient_reserve_at_time{time}"
     )
 
-# + [markdown] tags=[]
+# + [markdown] tags=[] slideshow={"slide_type": "slide"}
 # ## Solve Model
 # -
 
@@ -324,7 +371,9 @@ feasible = samples.filter(lambda d: d.is_feasible)
 
 feasible.to_pandas_dataframe(True)
 
+# + [markdown] slideshow={"slide_type": "slide"}
 # ## Inspect model
+# -
 
 lp_dump = dimod.lp.dumps(model)
 
