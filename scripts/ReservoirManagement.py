@@ -37,7 +37,13 @@
 # ### Is this a real problem?
 # -
 
-# > Supplying high-quality water at a competitive cost is a major challenge for water utilities worldwide, especially with ever-increasing water quality standards and energy prices [1,2]. Water supply systems are among the most important parts of infrastructure necessary to provide suitable quality of life for human beings.
+# > Supplying high-quality water at a competitive cost is a major challenge for water utilities worldwide, especially with ever-increasing water quality standards and energy prices
+
+# + [markdown] slideshow={"slide_type": "subslide"}
+# ### Why is it important?
+# -
+
+# > Water supply systems are among the most important parts of infrastructure necessary to provide suitable quality of life for human beings.
 #
 # > The issues of water production optimization and energy savings are part of the topic of sustainable development. 
 
@@ -47,8 +53,9 @@
 
 # > There are many kinds of costs connected with water supplies. Among them, costs of electric power make an important share of operating costs because of using many electric-powered pumps necessary to bring water from its source or sources to customers
 #
-# Based on the provided data, the power cost of operating all the pumps constanly is 288.30555 2015-USD per day, which is a very loose upper bound.
+# In a previous paper the authors state that the worst case 24h cost for the given data is 334.04 PLN (= 88.77 USD in Aug 2015)which is an extremely loose upper bound on the ROI.
 # There is no data to quantify other benefits of optimization, such as reduced risk of reservoir constraint violations and reduced labor costs, if the pump scheduling were manual.
+# For a commercial project an accurate estimate of the current cost and potential ROI would be needed to evaluate the project.
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### Is there complete data for a self contained problem instance?
@@ -58,7 +65,9 @@
 #
 # > The supplier of electric power does not use the same rate per MWh in its pricing policy all day long. Instead, it uses three tariff levels (see Table 2). 
 #
-# > The example numerical data of the demand values for 24 timeslots of just one specific day are presented in Table 3 (along with corresponding electric power prices).
+# > The example numerical data of the demand values for 24 time slots of just one specific day are presented in Table 3 (along with corresponding electric power prices).
+#
+# This is critical to making progress on a problem.
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### What are the sources of complexity?
@@ -75,7 +84,21 @@
 # > An example containing real-world input data was successfully solved using Microsoft Excel with a free OpenSolver add-in.
 #
 # This would be a red flag in a real commercial application, as there is little benefit in a quantum implementation of a problem that is solved to optimality with a free Excel plugin.
-# This does affect the pedagogical value of this  problem and it is treated as a green field problem for the purposes of this exercise.
+# This does affect the pedagogical value of this problem.
+# In the previous paper the authors state that
+# > Thus far, due to the complexity of the task, the system operators have practically neglected the issue of electricity costs
+#
+# and
+#
+# > The current practice in small and medium-sized water companies in Poland indicates that the decision-making based on the experience of the operator does not guarantee a simultaneous meeting of all the requirements set for the operation of a water intake and minimization of electricity costs
+#
+# For the purposes of this discussion we assume this as the starting point.
+
+# + [markdown] slideshow={"slide_type": "subslide"}
+# ### What are the success criteria?
+# -
+
+# This is critical question in a commercial setting that is not addressed in this paper.
 
 # + [markdown] slideshow={"slide_type": "slide"}
 # ## Problem Description
@@ -222,7 +245,7 @@ def power_consumption(pump):
 
 # -
 
-# #### *The supplier of electric power does not use the same rate per MWh in its pricing policy all day. It uses three tariff levels*
+# #### *The supplier of electric power does not use the same rate per MWh in its pricing policy all day*
 
 def power_price(time):
     return schedule.power_price[time]/1000
@@ -309,9 +332,10 @@ model.set_objective(
 
 # + [markdown] tags=[] slideshow={"slide_type": "subslide"}
 # ### Add constraints
-# -
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # #### *Each pump must operate for at least one hour per day*
+# -
 
 for pump in pumps.id:
     model.add_constraint(
@@ -320,7 +344,9 @@ for pump in pumps.id:
         ) >= 1,
         f"pump{pump}_on_at_least_1h_per_day")
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # #### *At least one well and the pump integrated with it must be kept as a reserve at any moment of the day*
+# -
 
 for time in schedule.time:
     model.add_constraint(
@@ -329,11 +355,15 @@ for time in schedule.time:
         ) <= pumps.shape[0] - 1,
         f"at_least_one_pump_in_reserve_at_time{time}" )
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # #### *The water inside the tank should be replaced at least once per day (?)*
+# -
 
 # This constraint illustrates a common the need for working with engaged problem owners. The meaning of the constraint is unclear. The only known means of removing water from the reservoir is user demand, which is not under the control of the operator. The solution in the paper also does not explicitly enforce this constraint. In a real scenario this would require further discussion with the problem owner.
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # #### *The outflow of water from the reservoir tank via the distribution network to customers is a continuous process*
+# -
 
 for time in schedule.time:
     model.add_constraint(
@@ -341,7 +371,9 @@ for time in schedule.time:
         f"volume_at_time{time}"
     )
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # #### *... a single reservoir tank with the capacity of Vmax*
+# -
 
 for time in schedule.time:
     model.add_constraint(
@@ -349,7 +381,9 @@ for time in schedule.time:
         f"within_capacity_at_time{time}"
     )
 
+# + [markdown] slideshow={"slide_type": "subslide"}
 # #### *The volume of water in the reservoir tank cannot be less than Vmin*
+# -
 
 for time in schedule.time:
     model.add_constraint(
