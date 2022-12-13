@@ -233,7 +233,7 @@ reservoir = pd.read_csv("reservoir.csv", sep=' ').loc[0]
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### Inputs (Parameters)
 #
-# Items whose values are provided in the input data
+# Items provide an interface to values are provided in the input data.
 # -
 
 # #### Pumps
@@ -278,7 +278,7 @@ def power_price(time):
 # + [markdown] tags=[]
 # #### Water demand
 #
-# User demand varies by the hour. The projected hourly demend is give in the data
+# User demand varies by the hour. The projected hourly demend is give in the data.
 #
 # > **The demand for water varies over time**
 #
@@ -291,6 +291,8 @@ def water_demand(time):
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### Outputs (Variables)
+#
+# Construct variables for values computed by the model.
 # -
 
 # #### Pump operating schedule
@@ -365,7 +367,7 @@ def power_used(time):
 # ## Construct model
 # -
 
-# With a well designed domain interface constraints should reflect statements in the problem specification.
+# With a well designed domain interface the objective and constraints should reflect statements in the problem specification.
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### Initialize model
