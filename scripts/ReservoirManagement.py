@@ -321,7 +321,9 @@ def reservoir_volume(time):
 
 
 # + [markdown] slideshow={"slide_type": "subslide"}
-# ### Derived terms
+# ### Function & relations
+#
+# Derived terms expressing interactions between inputs and outputs.
 # -
 
 # #### Resrvoir inflow
@@ -361,6 +363,9 @@ def power_used(time):
 
 # + [markdown] slideshow={"slide_type": "slide"}
 # ## Construct model
+# -
+
+# With a well designed domain interface constraints should reflect statements in the problem specification.
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### Initialize model
