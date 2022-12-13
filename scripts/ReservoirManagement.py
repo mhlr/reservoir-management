@@ -65,7 +65,7 @@
 #
 # > The supplier of electric power does not use the same rate per MWh in its pricing policy all day long. Instead, it uses three tariff levels (see Table 2). 
 #
-# > The example numerical data of the demand values for 24 time slots of just one specific day are presented in Table 3 (along with corresponding electric power prices).
+# > The example numerical data of the demand values for 24 timeslots of just one specific day are presented in Table 3 (along with corresponding electric power prices).
 #
 # This is critical to making progress on a problem.
 
@@ -106,27 +106,31 @@
 
 # From [Kowalik P, Rzemieniak M. Binary Linear Programming as a Tool of Cost Optimization for a Water Supply Operator. Sustainability. 2021 13(6):3470.](https://doi.org/10.3390/su13063470)
 
+# >  In the paper, a problem of pump scheduling in regular everyday operations of a water supply operator is considered. The issues of water production optimization and energy savings are part of the topic of sustainable development. The objective of the article is the minimization of the cost of electric power used by the pumps supplying water. It is achieved thanks to the variability of both the demand for water and the price of electric power during the day combined with the possibility of storing water.
+#
 # > In order to optimize the operation of a water pumping station itself, it is necessary to create a pump schedule for some period of time (e.g., 24 h) that states when a given pump should be turned on and, if it is controllable, with what efficiency it should work (full capacity or below). Correct optimization requires defining many necessary constraints, including taking into account the predicted demand for water, which varies throughout the day, capacities of reservoir tanks and minimal volumes of water stored in them, costs of electrical power, etc.
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### Detailed specification
 
 # + [markdown] slideshow={"slide_type": "-"}
+# Below are quotes from the paper that contribute to the problem definition. The parts most relevant to the model formulation are highlighted
+#
 # > **The objective of the article is the minimization of the cost of electric power used by the pumps supplying water.**
 #
 # > The water supply system under consideration is that of a water supply operator based in a town with a population of about 25,000 inhabitants, located in Eastern Poland. **The main parts of the system are wells, pumps, a reservoir tank, and the distribution pipeline network.**
 #
-# > Supplied water is groundwater pumped from 7 wells. **The capacities and values of the electric power of the pumps are presented** in Table 1. **Water is pumped from the wells to a single reservoir tank with the capacity of Vmax** = 1500 m3 (the maximal volume of stored water).
+# > Supplied water is groundwater pumped from 7 wells. **The capacities and values of the electric power of the pumps are presented in Table 1*. **Water is pumped from the wells to a single reservoir tank with the capacity of Vmax = 1500 m3 (the maximal volume of stored water).**
 #
 # > **The demand for water varies over time**. **The outflow of water from the reservoir tank via the distribution network to customers is a continuous process.** For practical reasons, **predictions of demand are made for 24 one-hour timeslots**.
 #
-# > Controlling the pumps must obey the following requirements. **The pumps can operate with their nominal capacities only**, and the amount of water pumped by any pump depends on the time of operation only. **Each pump must operate for at least one hour per day.** Additionally, **at least one well and the pump integrated with it must be kept as a reserve at any moment of the day**. **The water inside the tank should be replaced at least once per day**. During standard operational conditions, **the volume of water in the reservoir tank cannot be less than Vmin** = 523.5 m3. It is the firefighting reserve, which is kept in order to satisfy an extra demand when a fire is extinguished by using water supplied from hydrants.
+# > Controlling the pumps must obey the following requirements. **The pumps can operate with their nominal capacities only**, and **the amount of water pumped by any pump depends on the time of operation only**. **Each pump must operate for at least one hour per day.** Additionally, **at least one well and the pump integrated with it must be kept as a reserve at any moment of the day**. **The water inside the tank should be replaced at least once per day**. During standard operational conditions, **the volume of water in the reservoir tank cannot be less than Vmin = 523.5 m3**. It is the firefighting reserve, which is kept in order to satisfy an extra demand when a fire is extinguished by using water supplied from hydrants.
 #
 # > ... **the supplier of electric power does not use the same rate per MWh in its pricing** policy all day long. Instead, it uses three tariff levels ...
 #
-# > Various prices of electric power make efficient controlling of the pumps much moredifficult because the requirements resulting from the demand levels as well as technical and safety conditions should be satisfied at the lowest cost.
+# > Various prices of electric power make efficient controlling of the pumps much more difficult because the requirements resulting from the demand levels as well as technical and safety conditions should be satisfied at the lowest cost.
 #
-# > As it has already been mentioned above, a basically continuous process of water distribution is approximately described in a discrete form, namely by specifying 24 predicted values of the demand for 24 one-hour times slots.
+# > As it has already been mentioned above, **a basically continuous process of water distribution is approximately described in a discrete form, namely by specifying 24 predicted values of the demand for 24 one-hour timeslots**.
 #
 # >  ... **in each timeslot, each pump can either be used or not**.
 
@@ -166,7 +170,7 @@ start end price
 # ### Horly water demand and power prices on 1 August 2015 (Table 3)
 
 # + slideshow={"slide_type": "-"}
-# %%file schedule.csv
+# %%file influences.csv
 time water_demand power_price
 1 44.62 169
 2 31.27 169
@@ -215,12 +219,14 @@ from dwave import system as dw
 # -
 
 pumps = pd.read_csv("pumps.csv", sep=' ').set_index('id', drop=False)
-schedule = pd.read_csv("schedule.csv", sep=' ').set_index('time', drop=False)
+influences = pd.read_csv("influences.csv", sep=' ').set_index('time', drop=False)
 tariff = pd.read_csv("tariff.csv", sep=' ')
 reservoir = pd.read_csv("reservoir.csv", sep=' ').loc[0]
 
 # + [markdown] tags=[] slideshow={"slide_type": "slide"}
 # ## Define domain language
+#
+# First define and implement concepts from the problem definition to use as first class elements of the model implementation.
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### Utilities
@@ -231,48 +237,90 @@ Sum = dimod.quicksum
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### Inputs (Parameters)
+#
+# Items whose values are provided in the input data
 # -
 
-# #### *The capacities and values of the electric power of the pumps are presented ...*
+# #### Pumps properties
+#
+# The problem definition  & data specify a number of pumps each with its pumping capacity and power requirements, which do not change over time.
+#
+# > **The capacities and values of the electric power of the pumps are presented in Table 1**
 
-# +
+# ##### Pump capacity
+
 def capacity(pump):
     return pumps.capacity[pump]
+
+
+# ##### Pump power consumption
 
 def power_consumption(pump):
     return pumps.power_consumption[pump]
 
 
-# -
-
-# #### *The supplier of electric power does not use the same rate per MWh in its pricing policy all day*
+# #### Power prices
+#
+# > **The supplier of electric power does not use the same rate per MWh in its pricing policy all day long. Instead, it uses three tariff levels (see Table 2).**
+#
+# The power tariffs from Table 2 are already provided broken out by hour in Table 3.
+#
+# > **So, the example numerical data of the demand values for 24 timeslots of just one specific day are presented in Table 3 (along with corresponding electric power prices)**
+#
+# The provided power needs to be divide by 1000 since the pump power consumption is gien in kWh.
 
 def power_price(time):
-    return schedule.power_price[time]/1000
+    return influences.power_price[time]/1000
 
 
-# #### *The demand for water varies over time*
+# + [markdown] tags=[]
+# #### Water demand
+#
+# User demand varies by the hour. The projected hourly demend is give in the data
+#
+# > **The demand for water varies over time**
+#
+# > **So, the example numerical data of the demand values for 24 timeslots of just one specific day are presented in Table 3 (along with corresponding electric power prices)**
+# -
 
 def water_demand(time):
-    return schedule.water_demand[time]
+    return influences.water_demand[time]
+
+
+# #### Timeslots
+#
+# > **a basically continuous process of water distribution is approximately described in a discrete form, namely by specifying 24 predicted values of the demand for 24 one-hour timeslots**
+
+timeslots = influences.time
 
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### Outputs (Variables)
 # -
 
-# #### *In each timeslot, each pump can either be used or not*
+# #### Pump operating schedule
+#
+# Which pumps are running at which times is the main decision made by the model.
+# It is modeled by a binary variable for each pump-time combination.
+#
+# > **The pumps can operate with their nominal capacities only, and the amount of water pumped by any pump depends on the time of operation only**
+#
+# > **In each timeslot, each pump can either be used or not**
 
 def is_running(pump, time):
     return dimod.Binary(f"pump{pump}_time{time}")
 
 
-# #### The state of the system is is the reservoir volume (implicit)
+# #### Resevoir volume
+#
+# Water pumped in excess of demand is retained in the reservoir to satisfy future demand.
+#
+# > **[The objective] is achieved thanks to the variability of both the demand for water and the price of electric power during the day combined with the possibility of storing water.**
 
 def reservoir_volume(time): 
     return (
         dimod.Real(f"volume_time{time}")
-        if time >= schedule.time.min()
+        if time >= timeslots.min()
         else reservoir.Vinit
     )
 
@@ -281,7 +329,11 @@ def reservoir_volume(time):
 # ### Derived terms
 # -
 
-# #### *Water is pumped from the wells to a single reservoir tank*
+# #### Resrvoir inflow
+#
+# The amoubt of water flowing into the reservoir is the sum of the capacities of the currently running pumps.
+#
+# > **Water is pumped from the wells to a single reservoir tank**
 
 def reservoir_inflow(time):
     return Sum(
@@ -290,7 +342,9 @@ def reservoir_inflow(time):
         )
 
 
-# #### *The outflow of water from the reservoir tank via the distribution network to customers is a continuous process*
+# #### Resrvoir putflow
+#
+# > **The outflow of water from the reservoir tank via the distribution network to customers is a continuous process**
 
 def reservoir_outflow(time):
     return (
@@ -299,7 +353,9 @@ def reservoir_outflow(time):
     )
 
 
-# #### Cost depends combined pump power use (implicit)
+# #### Combined power consumption
+#
+# The power consumed by the pumps running at a given time.
 
 def power_used(time):
     return Sum(
@@ -326,7 +382,7 @@ model = dimod.CQM()
 model.set_objective(
     Sum(
         power_price(time) * power_used(time)
-        for time in schedule.time
+        for time in timeslots
     )
 )
 
@@ -340,7 +396,7 @@ model.set_objective(
 for pump in pumps.id:
     model.add_constraint(
         Sum(
-            is_running(pump, time) for time in schedule.time
+            is_running(pump, time) for time in timeslots
         ) >= 1,
         f"pump{pump}_on_at_least_1h_per_day")
 
@@ -348,7 +404,7 @@ for pump in pumps.id:
 # #### *At least one well and the pump integrated with it must be kept as a reserve at any moment of the day*
 # -
 
-for time in schedule.time:
+for time in timeslots:
     model.add_constraint(
         Sum(
             is_running(pump, time) for pump in pumps.id
@@ -363,9 +419,11 @@ for time in schedule.time:
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # #### *The outflow of water from the reservoir tank via the distribution network to customers is a continuous process*
+#
+# The problem definition presents demand as the only form of outflow. A more realistic model would also account for water losses.
 # -
 
-for time in schedule.time:
+for time in timeslots:
     model.add_constraint(
         reservoir_outflow(time) == water_demand(time),
         f"volume_at_time{time}"
@@ -375,7 +433,7 @@ for time in schedule.time:
 # #### *... a single reservoir tank with the capacity of Vmax*
 # -
 
-for time in schedule.time:
+for time in timeslots:
     model.add_constraint(
         reservoir_volume(time) <= reservoir.Vmax,
         f"within_capacity_at_time{time}"
@@ -385,7 +443,7 @@ for time in schedule.time:
 # #### *The volume of water in the reservoir tank cannot be less than Vmin*
 # -
 
-for time in schedule.time:
+for time in timeslots:
     model.add_constraint(
         reservoir_volume(time) >= reservoir.Vmin,
         f"sufficient_reserve_at_time{time}"
