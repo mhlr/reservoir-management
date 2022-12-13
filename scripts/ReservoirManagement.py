@@ -167,10 +167,10 @@ start end price
 21 24 169.00
 
 # + [markdown] slideshow={"slide_type": "subslide"}
-# ### Horly water demand and power prices on 1 August 2015 (Table 3)
+# ### Exogenous variables (Table 3)
 
 # + slideshow={"slide_type": "-"}
-# %%file influences.csv
+# %%file exogenous.csv
 time water_demand power_price
 1 44.62 169
 2 31.27 169
@@ -215,13 +215,15 @@ import numpy as np
 import pandas as pd
 
 import dimod
+from dimod import quicksum as Sum
 from dwave import system as dw
 # -
 
 pumps = pd.read_csv("pumps.csv", sep=' ').set_index('id', drop=False)
-influences = pd.read_csv("influences.csv", sep=' ').set_index('time', drop=False)
+exogenous = pd.read_csv("exogenous.csv", sep=' ').set_index('time', drop=False)
 tariff = pd.read_csv("tariff.csv", sep=' ')
 reservoir = pd.read_csv("reservoir.csv", sep=' ').loc[0]
+
 
 # + [markdown] tags=[] slideshow={"slide_type": "slide"}
 # ## Define domain language
@@ -229,19 +231,12 @@ reservoir = pd.read_csv("reservoir.csv", sep=' ').loc[0]
 # First define and implement concepts from the problem definition to use as first class elements of the model implementation.
 
 # + [markdown] slideshow={"slide_type": "subslide"}
-# ### Utilities
-# -
-
-Sum = dimod.quicksum
-
-
-# + [markdown] slideshow={"slide_type": "subslide"}
 # ### Inputs (Parameters)
 #
 # Items whose values are provided in the input data
 # -
 
-# #### Pumps properties
+# #### Pumps
 #
 # The problem definition  & data specify a number of pumps each with its pumping capacity and power requirements, which do not change over time.
 #
@@ -259,6 +254,13 @@ def power_consumption(pump):
     return pumps.power_consumption[pump]
 
 
+# #### Timeslots
+#
+# > **a basically continuous process of water distribution is approximately described in a discrete form, namely by specifying 24 predicted values of the demand for 24 one-hour timeslots**
+
+timeslots = exogenous.time
+
+
 # #### Power prices
 #
 # > **The supplier of electric power does not use the same rate per MWh in its pricing policy all day long. Instead, it uses three tariff levels (see Table 2).**
@@ -270,7 +272,7 @@ def power_consumption(pump):
 # The provided power needs to be divide by 1000 since the pump power consumption is gien in kWh.
 
 def power_price(time):
-    return influences.power_price[time]/1000
+    return exogenous.power_price[time]/1000
 
 
 # + [markdown] tags=[]
@@ -284,14 +286,7 @@ def power_price(time):
 # -
 
 def water_demand(time):
-    return influences.water_demand[time]
-
-
-# #### Timeslots
-#
-# > **a basically continuous process of water distribution is approximately described in a discrete form, namely by specifying 24 predicted values of the demand for 24 one-hour timeslots**
-
-timeslots = influences.time
+    return exogenous.water_demand[time]
 
 
 # + [markdown] slideshow={"slide_type": "subslide"}
@@ -476,6 +471,8 @@ with open("reservoir.lp", "w") as f:
 
 # + [markdown] slideshow={"slide_type": "slide"}
 # # Formulation from paper
+#
+# Do not start by trying to write this:
 # -
 
 # ![image.png](attachment:f7d47661-2f6d-4736-b946-dea72d7b64d3.png)
