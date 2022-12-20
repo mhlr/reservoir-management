@@ -308,20 +308,6 @@ def is_running(pump, time):
     return dimod.Binary(f"pump{pump}_time{time}")
 
 
-# #### Resevoir volume
-#
-# Water pumped in excess of demand is retained in the reservoir to satisfy future demand.
-#
-# > **[The objective] is achieved thanks to the variability of both the demand for water and the price of electric power during the day combined with the possibility of storing water.**
-
-def reservoir_volume(time): 
-    return (
-        dimod.Real(f"volume_time{time}")
-        if time >= timeslots.min()
-        else reservoir.Vinit
-    )
-
-
 # + [markdown] slideshow={"slide_type": "subslide"}
 # ### Function & relations
 #
@@ -341,15 +327,22 @@ def reservoir_inflow(time):
         )
 
 
-# #### Resrvoir putflow
+# #### Resrvoir outflow
+# The paper presents demand as the only form of outflow. A more realistic model would also account for water losses.
 #
 # > **The outflow of water from the reservoir tank via the distribution network to customers is a continuous process**
 
-def reservoir_outflow(time):
-    return (
-        reservoir_volume(time-1) + reservoir_inflow(time)
-        - reservoir_volume(time)
-    )
+reservoir_outflow = water_demand
+
+
+# #### Resevoir volume
+#
+# Water pumped in excess of demand is retained in the reservoir to satisfy future demand.
+#
+# > **[The objective] is achieved thanks to the variability of both the demand for water and the price of electric power during the day combined with the possibility of storing water.**
+
+def reservoir_volume(time): 
+    return reservoir.Vinit + Sum(map(reservoir_inflow, range(1,time+1))) - Sum(map(reservoir_outflow, range(1,time+1)))
 
 
 # #### Combined power consumption
@@ -419,17 +412,12 @@ for time in timeslots:
 
 # This constraint illustrates a common the need for working with engaged problem owners. The meaning of the constraint is unclear. The only known means of removing water from the reservoir is user demand, which is not under the control of the operator. The solution in the paper also does not explicitly enforce this constraint. In a real scenario this would require further discussion with the problem owner.
 
-# + [markdown] slideshow={"slide_type": "subslide"}
-# #### *The outflow of water from the reservoir tank via the distribution network to customers is a continuous process*
-#
-# The problem definition presents demand as the only form of outflow. A more realistic model would also account for water losses.
-# -
-
-for time in timeslots:
-    model.add_constraint(
-        reservoir_outflow(time) == water_demand(time),
-        f"volume_at_time{time}"
-    )
+# + active=""
+# for time in timeslots:
+#     model.add_constraint(
+#         reservoir_outflow(time) == water_demand(time),
+#         f"volume_at_time{time}"
+#     )
 
 # + [markdown] slideshow={"slide_type": "subslide"}
 # #### *... a single reservoir tank with the capacity of Vmax*
@@ -458,12 +446,14 @@ for time in timeslots:
 sampler = dw.LeapHybridCQMSampler()
 
 # %%time
-samples = sampler.sample_cqm(model, time_limit=20)
+samples = sampler.sample_cqm(model, time_limit=120)
 samples.resolve()
 
-feasible = samples.filter(lambda d: d.is_feasible)
+feasible = samples.filter(lambda d: d.is_feasible).to_pandas_dataframe(True)
 
-feasible.to_pandas_dataframe(True)
+feasible.energy.hist()
+
+feasible.energy.min()
 
 # + [markdown] slideshow={"slide_type": "slide"}
 # ## Inspect model
