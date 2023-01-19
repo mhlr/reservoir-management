@@ -314,9 +314,9 @@ def is_running(pump, time):
 # Derived terms expressing interactions between inputs and outputs.
 # -
 
-# #### Resrvoir inflow
+# #### Reservoir inflow
 #
-# The amoubt of water flowing into the reservoir is the sum of the capacities of the currently running pumps.
+# The amount of water flowing into the reservoir is the sum of the capacities of the currently running pumps.
 #
 # > **Water is pumped from the wells to a single reservoir tank**
 
