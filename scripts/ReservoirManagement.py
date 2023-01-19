@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.14.2
+#       jupytext_version: 1.14.4
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -20,7 +20,7 @@
 # - The process is simulated using a paper from the literature as a proxy for the problem owner.
 #     - This is done enable reproducibility while protecting privacy of users.
 # - Only the problem motivation and description from the paper is used.
-# - The formulation & implementation are developed independently to illustrate a practical approach to the process.
+# - The definition & implementation are developed independently to illustrate a practical approach to the process.
 # - Inline quotes from the paper should be read as a problem owner's responses to developer inquiries.
 #     - Quotes are sometimes reused when they answer multiple questions.
 
@@ -467,7 +467,7 @@ with open("reservoir.lp", "w") as f:
     print(lp_dump, file=f)
 
 # + [markdown] slideshow={"slide_type": "slide"}
-# # Formulation from paper
+# ## Formulation from paper
 #
 # Do not start by trying to write this:
 # -
